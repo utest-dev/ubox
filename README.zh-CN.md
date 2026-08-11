@@ -53,95 +53,70 @@ flowchart LR
 5. 执行设备操作并采集结果。
 6. 断开设备并释放资源。
 
-## 快速开始：UBox MCP Server
 
-### 前置条件
+## 快速接入： UBox 云真机 SKILL 接入
 
-- Python 3.10 或 3.11
-- UBox 访问凭证
-- 支持 Streamable HTTP 或 SSE 的 MCP 客户端
+UBox 云真机 SKILL 用于将优测云真机能力接入 AI 智能体。按照以下六个步骤申请权限、加载 SKILL 并开始执行真机任务。
 
-可通过 [UBox 产品页](https://utest.21kunpeng.com/home/ubox?from=github)申请接入。
+### 1. 申请访问 Token
 
-### 1. 安装
+#### 1.1 注册账号并创建团队
 
-```bash
-python -m pip install ubox-mcp-server
-```
+登录[优测官网](https://utest.21kunpeng.com/home?from=github)，注册账号并创建团队。
 
-### 2. 配置凭证
+#### 1.2 提供团队 ID
 
-当前已发布的 `ubox-mcp-server` 包使用 Secret ID 和 Secret Key 启动服务。新建 `.env` 文件：
+访问[优测云真机页面](https://utest.21kunpeng.com/cloudphone/devicelist)，在页面右上角找到团队信息，并将团队 ID 提供给优测客服。
 
-```dotenv
-UBOX_SECRET_ID=your_secret_id
-UBOX_SECRET_KEY=your_secret_key
-UBOX_MODE=normal
-MCP_MODE=streamable-http
-MCP_HOST=localhost
-MCP_PORT=8000
-```
+#### 1.3 接收并记录访问凭证
 
-UBox 官方托管流程还说明 HTTP 请求可使用 Bearer Token 认证。请使用团队为当前部署或接入模式提供的凭证类型，不要混用。不要将 `.env` 或真实凭证提交到 Git。
-
-### 3. 启动服务
-
-```bash
-ubox-mcp-server
-```
-
-### 4. 配置 MCP 客户端
-
-以 Cline 为例：
+优测客服将下发 SKILL 所需的访问凭证：
 
 ```json
 {
-  "mcpServers": {
-    "ubox-mcp-server": {
-      "transport": "http",
-      "url": "http://localhost:8000/mcp",
-      "description": "UBox MCP Server for real-device automation"
-    }
-  }
+  "user_token": "",
+  "project_token": "",
+  "group_id": ""
 }
 ```
 
-### 5. 验证工具发现
+- `user_token`：联系优测客服申请。
+- `project_token`：联系优测客服申请。
+- `group_id`：登录优测网站后，从右上角团队信息中复制。
+- 所有凭证都应保存在代码仓库之外，不要提交到 Git。
 
-```bash
-curl -X POST http://localhost:8000/mcp \
-  -H 'Content-Type: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
-```
+### 2. 充值云真机产品
 
-连接后可向智能体发出任务：
+UBox 云真机 SKILL 调用优测云真机资源，计费规则与云真机产品一致。执行付费任务前，需要在优测官网充值云真机产品。
 
-> 查询可用的 Android 设备，连接一台真机，完成截图，然后断开设备。
+新用户注册并完成邮箱验证后，可获得 10 分钟云真机体验时长，具体以优测平台当前政策为准。
 
-## UBox CLI
+### 3. 获取并解压 SKILL 包
 
-安装 CLI：
+优测客服会单独发送 UBox 云真机 SKILL 包。下载后，将 SKILL 包解压到 AI 智能体可以访问的本地目录。
 
-```bash
-python -m pip install ubox-cli
-```
+### 4. 了解两部分工作流程
 
-将 Token 写入 `.env` 文件，或在终端中导出环境变量：
+#### 4.1 AI 智能体引擎
 
-```dotenv
-UBOX_AUTH_TOKEN=your_token
-```
+可以使用自建 AI Agent，也可以使用 CodeBuddy、WorkBuddy 等智能体环境。智能体引擎负责识别设备页面，并调用 UBox 云真机 SKILL。
 
-执行基础设备流程：
+#### 4.2 云真机执行引擎
 
-```bash
-ubox-cli device list --platform android
-ubox-cli device connect --udid DEVICE_UDID --os-type android
-ubox-cli screen screenshot --udid DEVICE_UDID
-ubox-cli device disconnect --udid DEVICE_UDID
-```
+UBox 云真机 SKILL 由智能体引擎发现和调用，将 AI 智能体连接到优测云真机，并在真实设备上执行操作。
 
-CLI 还支持应用管理、控件与 OCR 查找、点击与手势、屏幕录制、剪贴板、日志、性能采集，以及 Android/HarmonyOS 调试诊断。
+### 5. 加载 UBox 云真机 SKILL
+
+在智能体环境中添加或安装本地 SKILL，并选择解压后的 SKILL 目录。在 WorkBuddy 中可以跳过手动检测步骤，WorkBuddy 会在安装过程中于后台完成检测。
+
+### 6. 新建并执行云真机任务
+
+新建任务，以 `优测设备：` 作为提示词开头，可以更稳定地召回并使用本 SKILL。例如：
+
+> 优测设备：查询可用的 Android 设备，连接一台真机，完成截图，然后断开设备。
+
+首次使用时，SKILL 会自动安装所需的 CLI，并依次询问 Token。请填写团队对应的 `user_token`、`project_token` 和 `group_id`。
+
 
 ## 常见问题
 
