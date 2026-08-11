@@ -53,101 +53,68 @@ The basic workflow is:
 5. Execute device operations and collect results.
 6. Disconnect the device and release resources.
 
-## Quick start: UBox MCP Server
+## Quick start with UBox Skill
 
-### Prerequisites
+The UBox Cloud Device Skill lets an AI agent use UBox real-device capabilities. Follow the six steps below to request access, add the Skill to your agent, and start a device task.
 
-- Python 3.10 or 3.11
-- UBox credentials
-- An MCP client that supports Streamable HTTP or SSE
+### 1. Apply for access tokens
 
-Request access through the [UBox product page](https://utest.21kunpeng.com/home/ubox).
+#### 1.1 Register an account and create a team
 
-### 1. Install
+Sign in to the [UTest website](https://utest.21kunpeng.com/home?from=github), register an account, and create a team.
 
-```bash
-python -m pip install ubox-mcp-server
-```
+#### 1.2 Provide your team ID
 
-### 2. Configure credentials
+Open the [Cloud Device page](https://utest.21kunpeng.com/cloudphone/devicelist), find the team information in the upper-right corner, and send the team ID to the uTest support team.
 
-The published `ubox-mcp-server` package documents Secret ID and Secret Key for server startup. Create a `.env` file:
+#### 1.3 Receive and record the credentials
 
-```dotenv
-UBOX_SECRET_ID=your_secret_id
-UBOX_SECRET_KEY=your_secret_key
-UBOX_MODE=normal
-MCP_MODE=streamable-http
-MCP_HOST=localhost
-MCP_PORT=8000
-```
-
-The hosted UBox workflow also documents Bearer Token authentication for HTTP requests. Use the credential type supplied for your deployment or access mode; do not substitute one type for another. Never commit `.env` or credentials to Git.
-
-### 3. Start the MCP server
-
-```bash
-ubox-mcp-server
-```
-
-### 4. Connect an MCP client
-
-Example Cline configuration:
+The support team will provide the credentials required by the Skill:
 
 ```json
 {
-  "mcpServers": {
-    "ubox-mcp-server": {
-      "transport": "http",
-      "url": "http://localhost:8000/mcp",
-      "description": "UBox MCP Server for real-device automation"
-    }
-  }
+  "user_token": "",
+  "project_token": "",
+  "group_id": ""
 }
 ```
 
-### 5. Verify tool discovery
+- Request `user_token` and `project_token` from the uTest support team.
+- Copy `group_id` from the team information in the uTest website.
+- Keep all credentials outside source control and never commit them to Git.
 
-```bash
-curl -X POST http://localhost:8000/mcp \
-  -H 'Content-Type: application/json' \
-  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}'
-```
+### 2. Recharge UBox Cloud Device usage
 
-Then ask the connected agent to perform a task such as:
+The UBox Cloud Device Skill uses UBox real-device capacity and follows the same usage-based billing rules as the Cloud Device product. Recharge the Cloud Device product on the uTest website before running paid tasks.
 
-> List available Android devices, connect to one device, capture a screenshot, and disconnect the device.
+Newly registered users who complete email verification can receive 10 minutes of Cloud Device trial time, subject to the current uTest policy.
 
-## Command-line access with UBox CLI
+### 3. Obtain and extract the Skill package
 
-Install the CLI:
+The uTest support team will send you the UBox Cloud Device Skill package. Download the package and extract it to a local directory that your AI agent can access.
 
-```bash
-python -m pip install ubox-cli
-```
+### 4. Understand the two-part workflow
 
-Add the authentication token to a `.env` file or export it in the shell:
+#### 4.1 AI agent engine
 
-```dotenv
-UBOX_AUTH_TOKEN=your_token
-```
+Use your own AI agent or an agent environment such as CodeBuddy or WorkBuddy. The agent engine recognizes the device interface and calls the UBox Cloud Device Skill.
 
-Run a basic device workflow:
+#### 4.2 UBox device execution engine
 
-```bash
-ubox-cli device list --platform android
-ubox-cli device connect --udid DEVICE_UDID --os-type android
-ubox-cli screen screenshot --udid DEVICE_UDID
-ubox-cli device disconnect --udid DEVICE_UDID
-```
+The Skill is discovered and invoked by the agent engine. It connects the agent to UBox Cloud Devices and executes device operations on real devices.
 
-The CLI also supports application management, UI and OCR lookup, clicks and gestures, screen recording, clipboard access, logs, performance collection, and Android/HarmonyOS diagnostics.
+### 5. Load the UBox Cloud Device Skill
 
-## Supported platforms
+In your agent environment, add or install a local Skill and select the extracted Skill directory. In WorkBuddy, you can skip the manual validation step because WorkBuddy checks the Skill in the background during installation.
 
-UBox officially describes unified real-device access for Android, iOS, and HarmonyOS. The available tools can vary by platform, device, account, and release. For example, the current UBox CLI documentation lists ADB, Logcat, and ANR/Crash diagnostics for Android and HarmonyOS only.
+### 6. Start a Cloud Device task
 
-Before building an automated workflow, inspect the current tool list returned by the MCP server and verify each required operation on the target platform.
+Create a new task and begin the prompt with `优测设备：` to invoke the Skill reliably. For example:
+
+> 优测设备：查询可用的 Android 设备，连接一台真机，完成截图，然后断开设备。
+
+On first use, the Skill automatically installs the required CLI and asks for the tokens. Enter the `user_token`, `project_token`, and `group_id` issued for your team.
+
 
 ## Frequently asked questions
 
@@ -177,7 +144,7 @@ The published UBox MCP Server package uses Secret ID and Secret Key for server c
 
 ## Documentation
 
-- [UBox product overview](https://utest.21kunpeng.com/home/ubox)
+- [UBox product overview](https://utest.21kunpeng.com/home/ubox?from=github)
 - [UBox MCP Server package](https://pypi.org/project/ubox-mcp-server/)
 - [UBox CLI package](https://pypi.org/project/ubox-cli/)
 - [Model Context Protocol](https://modelcontextprotocol.io/)
